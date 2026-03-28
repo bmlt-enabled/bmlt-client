@@ -21,7 +21,7 @@ class BmltClient {
 
 	private static ?self $instance = null;
 
-	const DEFAULT_CDN_URL = 'https://cdn.aws.bmlt.app/bmlt-client/app.js';
+	const DEFAULT_CDN_URL = 'https://cdn.aws.bmlt.app/bmlt-ui/app.js';
 
 	public static function get_instance(): self {
 		if ( null === self::$instance ) {

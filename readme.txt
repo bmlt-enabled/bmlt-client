@@ -66,7 +66,7 @@ This plugin relies on external services to function properly:
 - **Purpose**: Provides the JavaScript Svelte component that renders the meeting list interface
 - **Data sent**: No user data is transmitted to this service. The plugin only loads the JavaScript library.
 - **When**: The script is loaded whenever a page contains the [bmlt_client] shortcode
-- **Terms of use**: https://github.com/bmlt-enabled/bmlt-client/blob/main/LICENSE
+- **Terms of use**: https://github.com/bmlt-enabled/bmlt-ui/blob/main/LICENSE
 
 == Changelog ==
 
