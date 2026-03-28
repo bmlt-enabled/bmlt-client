@@ -9,11 +9,11 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Embeds the BMLT Client meeting finder widget on any page or post.
+Embeds the BMLT UI meeting finder widget on any page or post.
 
 == Description ==
 
-BMLT Client is a lightweight WordPress plugin that embeds the [BMLT Client](https://client.bmlt.app/) meeting finder widget on any page or post using a simple shortcode.
+BMLT Client is a lightweight WordPress plugin that embeds the [BMLT UI](https://client.bmlt.app/) meeting finder widget on any page or post using a simple shortcode.
 
 Features:
 
@@ -61,8 +61,8 @@ The shortcode works in any context that processes WordPress shortcodes. If your 
 
 This plugin relies on external services to function properly:
 
-**BMLT Client Svelte Component**
-- **Service**: BMLT Client (https://client.bmlt.app)
+**BMLT UI Svelte Component**
+- **Service**: BMLT UI (https://client.bmlt.app)
 - **Purpose**: Provides the JavaScript Svelte component that renders the meeting list interface
 - **Data sent**: No user data is transmitted to this service. The plugin only loads the JavaScript library.
 - **When**: The script is loaded whenever a page contains the [bmlt_client] shortcode

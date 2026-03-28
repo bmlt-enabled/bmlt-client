@@ -91,7 +91,7 @@ class BmltClient {
 		wp_enqueue_script( 'bmlt-client', self::DEFAULT_CDN_URL, [], BMLTCLIENT_VERSION, [ 'strategy' => 'defer' ] );
 
 		/**
-		 * Filter the BmltMeetingListConfig passed to the widget.
+		 * Filter the BmltUiConfig passed to the widget.
 		 *
 		 * Add this to your theme's functions.php to configure the widget:
 		 *
@@ -107,11 +107,11 @@ class BmltClient {
 		 *
 		 * See https://client.bmlt.app/ for all available options.
 		 *
-		 * @param array $config Configuration array passed to BmltMeetingListConfig.
+		 * @param array $config Configuration array passed to BmltUiConfig.
 		 */
 		$config = (array) apply_filters( 'bmltclient_config', [] );
 		if ( ! empty( $config ) ) {
-			wp_localize_script( 'bmlt-client', 'BmltMeetingListConfig', $config );
+			wp_localize_script( 'bmlt-client', 'BmltUiConfig', $config );
 		}
 
 		wp_register_style( 'bmlt-client-style', false, [], BMLTCLIENT_VERSION );
