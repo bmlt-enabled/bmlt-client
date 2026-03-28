@@ -1,6 +1,6 @@
 # BMLT Client for WordPress
 
-WordPress plugin that embeds the [BMLT Client](https://client.bmlt.app/) meeting finder widget via shortcode.
+WordPress plugin that embeds the [BMLT UI](https://client.bmlt.app/) meeting finder widget via shortcode.
 
 ## Usage
 
