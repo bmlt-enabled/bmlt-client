@@ -19,10 +19,8 @@ Features:
 
 * List and map views with real-time search and filters
 * Meeting detail with directions and virtual meeting join link
-* Geolocation-based nearby search (optional)
 * Multi-language support
-* Configurable columns, map tiles, and custom markers
-* Shareable per-meeting URLs via hash routing
+* Shareable per-meeting URLs
 
 = Usage =
 
@@ -32,7 +30,7 @@ Add the shortcode to any page or post:
 
 Override settings per page:
 
-`[bmlt_client root_server="https://your-server/main_server" service_body="42" view="map"]`
+`[bmlt_client root_server="https://your-server/main_server" service_body="42"]`
 
 = Documentation =
 
@@ -58,6 +56,17 @@ Yes. Enter the service body ID (or a comma-separated list of IDs) in the Service
 = Does it work with page builders? =
 
 The shortcode works in any context that processes WordPress shortcodes. If your page builder does not render shortcodes automatically, use its dedicated shortcode block.
+
+== External services ==
+
+This plugin relies on external services to function properly:
+
+**BMLT Client Svelte Component**
+- **Service**: BMLT Client (https://client.bmlt.app)
+- **Purpose**: Provides the JavaScript Svelte component that renders the meeting list interface
+- **Data sent**: No user data is transmitted to this service. The plugin only loads the JavaScript library.
+- **When**: The script is loaded whenever a page contains the [bmlt_client] shortcode
+- **Terms of use**: https://github.com/bmlt-enabled/bmlt-client/blob/main/LICENSE
 
 == Changelog ==
 

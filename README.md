@@ -11,7 +11,7 @@ WordPress plugin that embeds the [BMLT Client](https://client.bmlt.app/) meeting
 Override settings per page:
 
 ```
-[bmlt_client root_server="https://your-server/main_server" service_body="42" view="map"]
+[bmlt_client root_server="https://your-server/main_server" service_body="42"]
 ```
 
 ## Installation
@@ -25,10 +25,9 @@ Override settings per page:
 
 Configured under **Settings → BMLT Client**. All settings can be overridden per-shortcode via attributes.
 
-| Setting | Shortcode Attribute | Description |
-|---|---|---|
-| Root Server URL | `root_server` | Required. Full URL to your BMLT root server |
-| Service Body IDs | `service_body` | Optional. Single ID or comma-separated list |
-| Default View | `view` | `list` or `map` |
+| Setting          | Shortcode Attribute | Description                                 |
+|------------------|---------------------|---------------------------------------------|
+| Root Server URL  | `root_server`       | Required. Full URL to your BMLT root server |
+| Service Body IDs | `service_body`      | Optional. Single ID or comma-separated list |
 
 Full documentation at **[client.bmlt.app](https://client.bmlt.app/)**.
