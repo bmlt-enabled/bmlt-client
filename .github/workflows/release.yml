@@ -26,7 +26,7 @@ jobs:
       BUILD_DIR: "build"
       DIST_DIR_GITHUB: "dist/github"
       GITHUB_RELEASE_FILENAME: "bmlt-client.zip"
-      PLUGIN: bmlt-client"
+      PLUGIN: bmlt-client
       MAINFILE: "bmlt-client.php"
     needs: [lint]
     permissions:
