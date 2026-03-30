@@ -25,9 +25,9 @@ jobs:
     env:
       BUILD_DIR: "build"
       DIST_DIR_GITHUB: "dist/github"
-      GITHUB_RELEASE_FILENAME: "bmlt-client.zip"
-      PLUGIN: bmlt-client
-      MAINFILE: "bmlt-client.php"
+      GITHUB_RELEASE_FILENAME: "crumb.zip"
+      PLUGIN: crumb
+      MAINFILE: "crumb.php"
     needs: [lint]
     permissions:
       contents: write

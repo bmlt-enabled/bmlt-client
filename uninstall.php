@@ -3,12 +3,12 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-$bmltclient_options = [
-	'bmltclient_root_server',
-	'bmltclient_service_body',
-	'bmltclient_css_template',
+$crumb_options = [
+	'crumb_root_server',
+	'crumb_service_body',
+	'crumb_css_template',
 ];
 
-foreach ( $bmltclient_options as $bmltclient_option ) {
-	delete_option( $bmltclient_option );
+foreach ( $crumb_options as $crumb_option ) {
+	delete_option( $crumb_option );
 }

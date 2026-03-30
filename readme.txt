@@ -1,4 +1,4 @@
-=== BMLT Client ===
+=== Crumb ===
 
 Contributors: bmltenabled, pjaudiomv
 Tags: narcotics anonymous, na, meetings, bmlt, meeting finder
@@ -9,11 +9,11 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Embeds the BMLT UI meeting finder widget on any page or post.
+Embeds the Crumb Widget meeting finder on any page or post.
 
 == Description ==
 
-BMLT Client is a lightweight WordPress plugin that embeds the [BMLT UI](https://client.bmlt.app/) meeting finder widget on any page or post using a simple shortcode.
+Crumb is a lightweight WordPress plugin that embeds the [Crumb Widget](https://crumb.bmlt.app/) meeting finder on any page or post using a simple shortcode.
 
 Features:
 
@@ -26,22 +26,22 @@ Features:
 
 Add the shortcode to any page or post:
 
-`[bmlt_client]`
+`[crumb]`
 
 Override settings per page:
 
-`[bmlt_client root_server="https://your-server/main_server" service_body="42"]`
+`[crumb root_server="https://your-server/main_server" service_body="42"]`
 
 = Documentation =
 
-Full documentation at [client.bmlt.app](https://client.bmlt.app/).
+Full documentation at [crumb.bmlt.app](https://crumb.bmlt.app/).
 
 == Installation ==
 
-1. Upload the plugin files to `/wp-content/plugins/bmlt-client/`.
+1. Upload the plugin files to `/wp-content/plugins/crumb/`.
 2. Activate the plugin through the Plugins screen in WordPress.
-3. Go to **Settings → BMLT Client** and enter your root server URL.
-4. Add `[bmlt_client]` to any page or post.
+3. Go to **Settings → Crumb** and enter your root server URL.
+4. Add `[crumb]` to any page or post.
 
 == Frequently Asked Questions ==
 
@@ -61,12 +61,12 @@ The shortcode works in any context that processes WordPress shortcodes. If your 
 
 This plugin relies on external services to function properly:
 
-**BMLT UI Svelte Component**
-- **Service**: BMLT UI (https://client.bmlt.app)
-- **Purpose**: Provides the JavaScript Svelte component that renders the meeting list interface
+**Crumb Widget**
+- **Service**: Crumb Widget (https://crumb.bmlt.app)
+- **Purpose**: Provides the JavaScript component that renders the meeting list interface
 - **Data sent**: No user data is transmitted to this service. The plugin only loads the JavaScript library.
-- **When**: The script is loaded whenever a page contains the [bmlt_client] shortcode
-- **Terms of use**: https://github.com/bmlt-enabled/bmlt-ui/blob/main/LICENSE
+- **When**: The script is loaded whenever a page contains the [crumb] shortcode
+- **Terms of use**: https://github.com/bmlt-enabled/crumb-widget/blob/main/LICENSE
 
 == Changelog ==
 

@@ -30,10 +30,10 @@ jobs:
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       S3_BUCKET: archives.bmlt.app
-      S3_KEY: bmlt-client
+      S3_KEY: crumb
       BUILD_DIR: build
       DIST_DIR_S3: dist/s3
-      PLUGIN: "bmlt-client"
+      PLUGIN: "crumb"
     needs: [ lint ]
     steps:
       - name: Check out code 🛒

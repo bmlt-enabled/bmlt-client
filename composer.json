@@ -1,6 +1,6 @@
 {
-  "name": "bmlt-enabled/bmlt-client",
-  "description": "This is a WordPress plugin for BMLT Client.",
+  "name": "bmlt-enabled/crumb",
+  "description": "Crumb WordPress plugin — embeds the Crumb meeting finder widget.",
   "type": "project",
   "license": "MIT",
   "authors": [
