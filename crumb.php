@@ -42,25 +42,31 @@ class Crumb {
 	// -------------------------------------------------------------------------
 
 	public static function setup_shortcode( array $atts ): string {
+		// Use null as sentinel so we can distinguish "not provided" from explicit empty string.
 		$atts = shortcode_atts(
 			[
-				'server'  => get_option( 'crumb_server', 'https://latest.aws.bmlt.app/main_server/' ),
-				'service_body' => get_option( 'crumb_service_body', '1047,1048' ),
+				'server'       => null,
+				'service_body' => null,
 			],
 			$atts,
 			'crumb'
 		);
 
-		$server = esc_url( trim( $atts['server'] ) );
+		// Shortcode attribute takes precedence; fall back to saved option only when not provided.
+		$server = esc_url( trim( $atts['server'] ?? get_option( 'crumb_server', 'https://latest.aws.bmlt.app/main_server/' ) ) );
 
 		if ( empty( $server ) ) {
 			return '<p style="color:red"><strong>Crumb:</strong> a <code>server</code> URL is required.</p>';
 		}
 
+		// null  → not in shortcode, use saved option.
+		// ''    → explicitly set to empty in shortcode, omit data-service-body (show all meetings).
+		$service_body = $atts['service_body'] ?? get_option( 'crumb_service_body', '1047,1048' );
+
 		$div = '<div id="crumb-widget" data-server="' . $server . '"';
 
-		if ( ! empty( $atts['service_body'] ) ) {
-			$div .= ' data-service-body="' . esc_attr( trim( $atts['service_body'] ) ) . '"';
+		if ( ! empty( $service_body ) ) {
+			$div .= ' data-service-body="' . esc_attr( trim( $service_body ) ) . '"';
 		}
 
 		$div .= '></div>';
