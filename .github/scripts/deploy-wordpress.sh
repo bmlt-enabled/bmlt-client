@@ -58,7 +58,6 @@ if [ $error == 0 ]; then
 fi
 
 # Unzip the built plugin
-
 unzip -q -o "$GITHUB_RELEASE_FILENAME"
 
 rm "$GITHUB_RELEASE_FILENAME"
@@ -86,50 +85,18 @@ elif [ "$PLUGINVERSION" = "$READMEVERSION" ]; then
     echo "Versions match in readme.txt and $MAINFILE. Let's continue..."
 fi
 
-# Checkout the SVN repo
-svn co "http://svn.wp-plugins.org/$PLUGIN" svn
+# Checkout trunk to get current state from WordPress.org
+svn co "https://plugins.svn.wordpress.org/$PLUGIN/trunk" svn/trunk
 
-# Move out the trunk directory to a temp location
-mv svn/trunk ./svn-trunk
-# Create trunk directory
-mkdir svn/trunk
-# Copy our new version of the plugin into trunk
-rsync -r -p $PLUGIN/* svn/trunk
+# Copy our new version of the plugin into trunk (exclude .svn to preserve working copy)
+rsync -r -p --delete --exclude='.svn' $PLUGIN/ svn/trunk/
 
-# Copy all the .svn folders from the checked out copy of trunk to the new trunk.
-# This is necessary as the Travis container runs Subversion 1.6 which has .svn dirs in every sub dir
-cd svn/trunk/
-TARGET=$(pwd)
-cd ../../svn-trunk/
+# Add new files to SVN in trunk
+svn stat svn/trunk | grep '^?' | awk '{print $2}' | xargs -I x svn add x@
+# Remove deleted files from SVN in trunk
+svn stat svn/trunk | grep '^!' | awk '{print $2}' | xargs -I x svn rm --force x@
 
-# Find all .svn dirs in sub dirs
-SVN_DIRS=`find . -type d -iname .svn`
-
-for SVN_DIR in $SVN_DIRS; do
-    SOURCE_DIR=${SVN_DIR/.}
-    TARGET_DIR=$TARGET${SOURCE_DIR/.svn}
-    TARGET_SVN_DIR=$TARGET${SVN_DIR/.}
-    if [ -d "$TARGET_DIR" ]; then
-        # Copy the .svn directory to trunk dir
-        cp -r $SVN_DIR $TARGET_SVN_DIR
-    fi
-done
-
-# Back to builds dir
-cd ../
-
-# Remove checked out dir
-rm -fR svn-trunk
-
-# Add new version tag
-mkdir svn/tags/$VERSION
-rsync -r -p $PLUGIN/* svn/tags/$VERSION
-
-# Add new files to SVN
-svn stat svn | grep '^?' | awk '{print $2}' | xargs -I x svn add x@
-# Remove deleted files from SVN
-svn stat svn | grep '^!' | awk '{print $2}' | xargs -I x svn rm --force x@
-svn stat svn
+svn stat svn/trunk
 
 # this is so we can test a deploy without the final svn commit, if theres a hyphen in tag but doesn't contain beta in it we will get here.
 if [[ "$SCRIPT_TAG" == *"-"* ]]; then
@@ -137,8 +104,33 @@ if [[ "$SCRIPT_TAG" == *"-"* ]]; then
     exit 0
 fi
 
-# Commit to SVN
-svn ci --no-auth-cache --username $WORDPRESS_USERNAME --password $WORDPRESS_PASSWORD svn -m "Deploy version $VERSION"
+# Commit trunk to SVN
+echo "Committing changes to trunk..."
+svn ci --no-auth-cache --username $WORDPRESS_USERNAME --password $WORDPRESS_PASSWORD svn/trunk -m "Deploy version $VERSION"
+
+if [ $? -ne 0 ]; then
+    echo "Failed to commit to trunk" 1>&2
+    exit 1
+fi
+
+echo "Trunk committed successfully!"
+echo "Waiting for SVN server to synchronize..."
+sleep 3
+
+# Create new version tag from the updated trunk using svn copy
+echo "Creating tag $VERSION from trunk..."
+svn copy "https://plugins.svn.wordpress.org/$PLUGIN/trunk" \
+         "https://plugins.svn.wordpress.org/$PLUGIN/tags/$VERSION" \
+         --username $WORDPRESS_USERNAME --password $WORDPRESS_PASSWORD \
+         -m "Tagging version $VERSION"
+
+if [ $? -ne 0 ]; then
+    echo "Failed to create tag $VERSION" 1>&2
+    exit 1
+fi
+
+echo "Tag $VERSION created successfully!"
+echo "Deployment completed successfully!"
 
 # Remove SVN temp dir
 rm -fR svn
