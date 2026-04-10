@@ -5,7 +5,7 @@ Tags: narcotics anonymous, na, meetings, bmlt, meeting finder
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,6 +93,10 @@ The widget fetches meeting data from a BMLT server whose URL you configure in Se
 - Privacy policy: Determined by the operator of your configured BMLT server. Learn more at https://bmlt.app.
 
 == Changelog ==
+
+= 1.0.2 =
+* Updated readme to document external services (CDN and BMLT server) with privacy policy links.
+* Fixed late-escaping of inline CSS output per WordPress coding standards.
 
 = 1.0.1 =
 * Added `view` shortcode attribute and admin setting to set the default widget view (`list` or `map`).
