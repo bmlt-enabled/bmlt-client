@@ -3,7 +3,7 @@
  * Plugin Name: Crumb
  * Plugin URI: https://wordpress.org/plugins/crumb/
  * Description: Embeds the Crumb meeting finder widget on any page or post using a shortcode.
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: bmltenabled
  * Author URI: https://bmlt.app
  * License: GPL v2 or later
@@ -15,11 +15,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CRUMB_VERSION', '1.0.1' );
+define( 'CRUMB_VERSION', '1.0.3' );
 
 class Crumb {
 
 	private static ?self $instance = null;
+	private static ?bool $shortcode_geolocation = null;
 
 	const DEFAULT_CDN_URL = 'https://cdn.aws.bmlt.app/crumb-widget.js';
 
@@ -33,6 +34,7 @@ class Crumb {
 	private function __construct() {
 		add_shortcode( 'crumb', [ static::class, 'setup_shortcode' ] );
 		add_action( 'wp_enqueue_scripts', [ static::class, 'assets' ] );
+		add_action( 'wp_footer', [ static::class, 'localize_config' ], 1 );
 		add_action( 'admin_menu', [ static::class, 'admin_menu' ] );
 		add_action( 'admin_init', [ static::class, 'register_settings' ] );
 	}
@@ -48,10 +50,16 @@ class Crumb {
 				'server'       => null,
 				'service_body' => null,
 				'view'         => null,
+				'geolocation'  => null,
 			],
 			$atts,
 			'crumb'
 		);
+
+		// Store geolocation for merging into CrumbWidgetConfig during wp_footer.
+		if ( null !== $atts['geolocation'] ) {
+			self::$shortcode_geolocation = filter_var( $atts['geolocation'], FILTER_VALIDATE_BOOLEAN );
+		}
 
 		// Shortcode attribute takes precedence; fall back to saved option only when not provided.
 		$server = esc_url( trim( $atts['server'] ?? get_option( 'crumb_server', 'https://latest.aws.bmlt.app/main_server/' ) ) );
@@ -104,7 +112,49 @@ class Crumb {
 			return;
 		}
 
-		wp_enqueue_script( 'crumb', self::DEFAULT_CDN_URL, [], CRUMB_VERSION, [ 'strategy' => 'defer' ] );
+		wp_enqueue_script(
+			'crumb',
+			self::DEFAULT_CDN_URL,
+			[],
+			CRUMB_VERSION,
+			[
+				'strategy'  => 'defer',
+				'in_footer' => true,
+			]
+		);
+
+		wp_register_style( 'crumb-style', false, [], CRUMB_VERSION );
+		wp_enqueue_style( 'crumb-style' );
+		wp_add_inline_style( 'crumb-style', wp_strip_all_tags( self::build_css() ) );
+	}
+
+	private static function build_css(): string {
+		$template = get_option( 'crumb_css_template', '' );
+
+		if ( 'full_width' === $template ) {
+			return '.crumb-full-width { width: 100%; }';
+		}
+
+		if ( 'full_width_force' === $template ) {
+			return '.crumb-full-width-force { width: 100vw !important; position: relative !important; left: 50% !important; margin-left: -50vw !important; box-sizing: border-box !important; max-width: none !important; }';
+		}
+
+		return '';
+	}
+
+	/**
+	 * Output CrumbWidgetConfig via wp_localize_script.
+	 *
+	 * Hooked to wp_footer (priority 1) so it runs after shortcode processing
+	 * but before the deferred script prints.
+	 */
+	public static function localize_config(): void {
+		if ( ! wp_script_is( 'crumb', 'enqueued' ) ) {
+			return;
+		}
+
+		// Build config: stored option → filter → shortcode geolocation override.
+		$config = self::get_config();
 
 		/**
 		 * Filter the CrumbWidgetConfig passed to the widget.
@@ -125,28 +175,53 @@ class Crumb {
 		 *
 		 * @param array $config Configuration array passed to CrumbWidgetConfig.
 		 */
-		$config = (array) apply_filters( 'crumb_config', [] );
+		$config = (array) apply_filters( 'crumb_config', $config );
+
+		if ( null !== self::$shortcode_geolocation ) {
+			$config['geolocation'] = self::$shortcode_geolocation;
+		}
+
 		if ( ! empty( $config ) ) {
 			wp_localize_script( 'crumb', 'CrumbWidgetConfig', $config );
 		}
-
-		wp_register_style( 'crumb-style', false, [], CRUMB_VERSION );
-		wp_enqueue_style( 'crumb-style' );
-		wp_add_inline_style( 'crumb-style', wp_strip_all_tags( self::build_css() ) );
 	}
 
-	private static function build_css(): string {
-		$template = get_option( 'crumb_css_template', '' );
+	private static function get_config(): array {
+		$config_json = get_option( 'crumb_widget_config', '' );
 
-		if ( 'full_width' === $template ) {
-			return '.crumb-full-width { width: 100%; }';
+		if ( empty( $config_json ) ) {
+			return [];
 		}
 
-		if ( 'full_width_force' === $template ) {
-			return '.crumb-full-width-force { width: 100vw !important; position: relative !important; left: 50% !important; margin-left: -50vw !important; box-sizing: border-box !important; max-width: none !important; }';
+		$config = json_decode( $config_json, true );
+
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			return [];
 		}
 
-		return '';
+		return $config;
+	}
+
+	public static function sanitize_config( string $input ): string {
+		$input = trim( $input );
+
+		if ( '' === $input ) {
+			return '';
+		}
+
+		$decoded = json_decode( $input, true );
+
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			add_settings_error(
+				'crumb_widget_config',
+				'invalid_json',
+				'Widget Configuration must be valid JSON. Your previous value has been preserved.',
+				'error'
+			);
+			return get_option( 'crumb_widget_config', '' );
+		}
+
+		return wp_json_encode( $decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
 	}
 
 	// -------------------------------------------------------------------------
@@ -170,9 +245,43 @@ class Crumb {
 		register_setting( $group, 'crumb_service_body', 'sanitize_text_field' );
 		register_setting( $group, 'crumb_css_template', 'sanitize_text_field' );
 		register_setting( $group, 'crumb_view', 'sanitize_text_field' );
+		register_setting(
+			$group,
+			'crumb_widget_config',
+			[
+				'type'              => 'string',
+				'sanitize_callback' => [ static::class, 'sanitize_config' ],
+			]
+		);
 	}
 
 	public static function settings_page(): void {
+		$example_config = wp_json_encode(
+			[
+				'language'          => 'en',
+				'geolocation'       => true,
+				'geolocationRadius' => 75,
+				'height'            => 800,
+				'darkMode'          => 'auto',
+				'nowOffset'         => 10,
+				'hideHeader'        => false,
+				'columns'           => [ 'time', 'name', 'location', 'address' ],
+				'map'               => [
+					'tiles'   => [
+						'url'         => '...',
+						'attribution' => '...',
+					],
+					'markers' => [
+						'location' => [
+							'html'   => '...',
+							'width'  => 23,
+							'height' => 33,
+						],
+					],
+				],
+			],
+			JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+		);
 		?>
 		<div class="wrap">
 			<h1>Crumb Settings</h1>
@@ -226,26 +335,35 @@ class Crumb {
 				</table>
 
 				<h2>Advanced Configuration</h2>
-				<p>
-					<?php esc_html_e( 'To configure language, geolocation, columns, map tiles, and other options, add a filter to your theme\'s', 'crumb' ); ?>
-					<code>functions.php</code>:
-				</p>
-				<pre style="background:#f6f7f7;padding:12px;overflow:auto"><code>add_filter( 'crumb_config', function( $config ) {
-	return array_merge( $config, [
-		'language'          => 'en',
-		'geolocation'       => true,
-		'geolocationRadius' => 20,
-		'height'            => 800,
-		'columns'           => [ 'time', 'name', 'location', 'address', 'service_body' ],
-	] );
-} );</code></pre>
 				<p><a href="https://crumb.bmlt.app/" target="_blank"><?php esc_html_e( 'See documentation for all available options.', 'crumb' ); ?></a></p>
+
+				<table class="form-table">
+					<tr>
+						<th scope="row"><label for="crumb_widget_config">Widget Configuration</label></th>
+						<td>
+							<?php $widget_config = get_option( 'crumb_widget_config', '' ); ?>
+							<textarea id="crumb_widget_config" name="crumb_widget_config"
+									  rows="15" cols="80"
+									  style="font-family: monospace; font-size: 12px;"><?php echo esc_textarea( $widget_config ); ?></textarea>
+							<p class="description">
+								Optional. CrumbWidgetConfig in JSON format. Leave empty to use defaults.
+							</p>
+							<details>
+								<summary><strong>Available Options</strong></summary>
+								<pre style="background:#f6f7f7;padding:12px;overflow:auto;margin-top:10px;font-size:11px;"><?php echo esc_html( $example_config ); ?></pre>
+							</details>
+							<p class="description" style="margin-top:8px;">
+								<?php esc_html_e( 'You can also use the crumb_config filter in your theme\'s functions.php for programmatic configuration.', 'crumb' ); ?>
+							</p>
+						</td>
+					</tr>
+				</table>
 
 				<h2>Shortcode Usage</h2>
 				<p><?php esc_html_e( 'Place this shortcode on any page or post:', 'crumb' ); ?></p>
 				<code>[crumb]</code>
-				<p><?php esc_html_e( 'Override server, service body, or view per page:', 'crumb' ); ?></p>
-				<code>[crumb server="https://your-server/main_server" service_body="42" view="map"]</code>
+				<p><?php esc_html_e( 'Override settings per page:', 'crumb' ); ?></p>
+				<code>[crumb server="https://your-server/main_server" service_body="42" view="map" geolocation="true"]</code>
 
 				<?php submit_button(); ?>
 			</form>

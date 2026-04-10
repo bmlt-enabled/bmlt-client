@@ -5,7 +5,7 @@ Tags: narcotics anonymous, na, meetings, bmlt, meeting finder
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,13 +30,14 @@ Add the shortcode to any page or post:
 
 Override settings per page:
 
-`[crumb server="https://your-server/main_server" service_body="42" view="map"]`
+`[crumb server="https://your-server/main_server" service_body="42" view="map" geolocation="true"]`
 
 Shortcode attributes:
 
 * `server` — BMLT server URL (overrides the value set in Settings → Crumb)
 * `service_body` — Service body ID or comma-separated list; leave empty to show all meetings
 * `view` — Default view when the widget loads: `list` (default) or `map`; can also be overridden at runtime via the `?view=` query parameter
+* `geolocation` — Enable or disable geolocation for this page: `true` or `false`
 
 = Documentation =
 
@@ -93,6 +94,10 @@ The widget fetches meeting data from a BMLT server whose URL you configure in Se
 - Privacy policy: Determined by the operator of your configured BMLT server. Learn more at https://bmlt.app.
 
 == Changelog ==
+
+= 1.0.3 =
+* Added Widget Configuration setting (JSON) for CrumbWidgetConfig options (language, geolocation, darkMode, columns, map tiles, etc.).
+* Added `geolocation` shortcode attribute to enable or disable geolocation per page.
 
 = 1.0.2 =
 * Updated readme to document external services (CDN and BMLT server) with privacy policy links.

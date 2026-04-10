@@ -11,7 +11,7 @@ WordPress plugin that embeds the [Crumb Widget](https://crumb.bmlt.app/) meeting
 Override settings per page:
 
 ```
-[crumb server="https://your-server/main_server" service_body="42"]
+[crumb server="https://your-server/main_server" service_body="42" geolocation="true"]
 ```
 
 ## Installation
@@ -25,9 +25,11 @@ Override settings per page:
 
 Configured under **Settings → Crumb**. All settings can be overridden per-shortcode via attributes.
 
-| Setting          | Shortcode Attribute | Description                            |
-|------------------|----------------|---------------------------------------------|
-| Server URL       | `server`       | Required. Full URL to your BMLT Server      |
-| Service Body IDs | `service_body` | Optional. Single ID or comma-separated list |
+| Setting              | Shortcode Attribute | Description                              |
+|----------------------|---------------------|------------------------------------------|
+| Server URL           | `server`            | Required. Full URL to your BMLT Server   |
+| Service Body IDs     | `service_body`      | Optional. Single ID or comma-separated list |
+| —                    | `geolocation`       | Optional. `true` or `false` per page     |
+| Widget Configuration | —                   | Optional. JSON for CrumbWidgetConfig     |
 
 Full documentation at **[crumb.bmlt.app](https://crumb.bmlt.app/)**.
