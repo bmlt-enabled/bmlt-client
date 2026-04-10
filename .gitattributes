@@ -6,7 +6,13 @@ composer.json export-ignore
 composer.lock export-ignore
 docker-compose.yml export-ignore
 Dockerfile export-ignore
+Dockerfile.test export-ignore
+docker-compose.test.yml export-ignore
 Makefile export-ignore
+phpunit.xml export-ignore
+/bin export-ignore
+/tests export-ignore
 CONTRIBUTING.md export-ignore
 README.md export-ignore
 /.github export-ignore
+assets/

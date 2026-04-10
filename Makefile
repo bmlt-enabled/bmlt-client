@@ -54,3 +54,12 @@ mysql:  ## Runs mysql cli in mysql container
 .PHONY: bash
 bash:  ## Runs bash shell in wordpress container
 	docker exec -it -w /var/www/html $(BASENAME)-wordpress-1 bash
+
+.PHONY: test
+test:  ## Run tests in Docker (builds fresh each time)
+	docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from test
+	docker compose -f docker-compose.test.yml down
+
+.PHONY: test-clean
+test-clean:  ## Remove test containers and images
+	docker compose -f docker-compose.test.yml down --rmi local --volumes

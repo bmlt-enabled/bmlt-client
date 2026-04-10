@@ -37,6 +37,7 @@ class Crumb {
 		add_action( 'wp_footer', [ static::class, 'localize_config' ], 1 );
 		add_action( 'admin_menu', [ static::class, 'admin_menu' ] );
 		add_action( 'admin_init', [ static::class, 'register_settings' ] );
+		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), [ static::class, 'settings_link' ] );
 	}
 
 	// -------------------------------------------------------------------------
@@ -227,6 +228,12 @@ class Crumb {
 	// -------------------------------------------------------------------------
 	// Admin
 	// -------------------------------------------------------------------------
+
+	public static function settings_link( array $links ): array {
+		$settings_url = admin_url( 'options-general.php?page=crumb' );
+		$links[]      = "<a href='{$settings_url}'>Settings</a>";
+		return $links;
+	}
 
 	public static function admin_menu(): void {
 		add_options_page(
