@@ -3,7 +3,7 @@
  * Plugin Name: Crumb
  * Plugin URI: https://wordpress.org/plugins/crumb/
  * Description: Embeds the Crumb meeting finder widget on any page or post using a shortcode.
- * Version: 1.0.3
+ * Version: 1.1.0
  * Author: bmltenabled
  * Author URI: https://bmlt.app
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CRUMB_VERSION', '1.0.3' );
+define( 'CRUMB_VERSION', '1.1.0' );
 
 class Crumb {
 
@@ -23,6 +23,7 @@ class Crumb {
 	private static ?bool $shortcode_geolocation = null;
 
 	const DEFAULT_CDN_URL = 'https://cdn.aws.bmlt.app/crumb-widget.js';
+	const REWRITE_VERSION = '1';
 
 	public static function get_instance(): self {
 		if ( null === self::$instance ) {
@@ -37,7 +38,55 @@ class Crumb {
 		add_action( 'wp_footer', [ static::class, 'localize_config' ], 1 );
 		add_action( 'admin_menu', [ static::class, 'admin_menu' ] );
 		add_action( 'admin_init', [ static::class, 'register_settings' ] );
+		add_action( 'init', [ static::class, 'init_rewrite_rules' ] );
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), [ static::class, 'settings_link' ] );
+	}
+
+	// -------------------------------------------------------------------------
+	// Activation / Deactivation
+	// -------------------------------------------------------------------------
+
+	public static function activate(): void {
+		$base_path = get_option( 'crumb_base_path', '' );
+		if ( ! empty( $base_path ) ) {
+			self::register_rewrite_rules( $base_path );
+			flush_rewrite_rules();
+		}
+		update_option( 'crumb_rewrite_version', self::REWRITE_VERSION );
+	}
+
+	public static function deactivate(): void {
+		flush_rewrite_rules();
+		delete_option( 'crumb_rewrite_version' );
+	}
+
+	// -------------------------------------------------------------------------
+	// Rewrite Rules
+	// -------------------------------------------------------------------------
+
+	private static function register_rewrite_rules( string $base_path ): void {
+		if ( empty( $base_path ) ) {
+			return;
+		}
+		$base_path = trim( $base_path, '/' );
+		add_rewrite_rule(
+			'^' . preg_quote( $base_path, '/' ) . '(/.*)?$',
+			'index.php?pagename=' . $base_path,
+			'top'
+		);
+	}
+
+	public static function init_rewrite_rules(): void {
+		$base_path = get_option( 'crumb_base_path', '' );
+
+		if ( ! empty( $base_path ) ) {
+			self::register_rewrite_rules( $base_path );
+
+			if ( get_option( 'crumb_rewrite_version' ) !== self::REWRITE_VERSION ) {
+				flush_rewrite_rules();
+				update_option( 'crumb_rewrite_version', self::REWRITE_VERSION );
+			}
+		}
 	}
 
 	// -------------------------------------------------------------------------
@@ -86,6 +135,11 @@ class Crumb {
 
 		if ( ! empty( $view ) ) {
 			$div .= ' data-view="' . esc_attr( $view ) . '"';
+		}
+
+		$base_path = get_option( 'crumb_base_path', '' );
+		if ( '' !== $base_path ) {
+			$div .= ' data-path="/' . esc_attr( trim( $base_path, '/' ) ) . '"';
 		}
 
 		$div .= '></div>';
@@ -203,6 +257,17 @@ class Crumb {
 		return $config;
 	}
 
+	public static function sanitize_base_path( string $input ): string {
+		$old_value = get_option( 'crumb_base_path', '' );
+		$new_value = sanitize_text_field( trim( $input, '/' ) );
+
+		if ( $old_value !== $new_value ) {
+			update_option( 'crumb_rewrite_version', '' );
+		}
+
+		return $new_value;
+	}
+
 	public static function sanitize_config( string $input ): string {
 		$input = trim( $input );
 
@@ -252,6 +317,14 @@ class Crumb {
 		register_setting( $group, 'crumb_service_body', 'sanitize_text_field' );
 		register_setting( $group, 'crumb_css_template', 'sanitize_text_field' );
 		register_setting( $group, 'crumb_view', 'sanitize_text_field' );
+		register_setting(
+			$group,
+			'crumb_base_path',
+			[
+				'type'              => 'string',
+				'sanitize_callback' => [ static::class, 'sanitize_base_path' ],
+			]
+		);
 		register_setting(
 			$group,
 			'crumb_widget_config',
@@ -329,6 +402,22 @@ class Crumb {
 						</td>
 					</tr>
 					<tr>
+						<th scope="row"><label for="crumb_base_path">Base Path for Pretty URLs</label></th>
+						<td>
+							<input type="text" id="crumb_base_path" name="crumb_base_path"
+								   value="<?php echo esc_attr( get_option( 'crumb_base_path', '' ) ); ?>"
+								   class="regular-text" placeholder="meetings" />
+							<p class="description">
+								Optional. The page slug where the widget lives (e.g. <code>meetings</code>).
+								Enables clean URLs like <code>/meetings/monday-night-meeting-42</code> instead of hash-based routing.
+								Leave empty to use default hash-based routing (<code>#/monday-night-meeting-42</code>).
+							</p>
+							<p class="description">
+								After changing this value, go to <strong>Settings &rarr; Permalinks</strong> and click <strong>Save Changes</strong> to update rewrite rules.
+							</p>
+						</td>
+					</tr>
+					<tr>
 						<th scope="row"><label for="crumb_view">Default View</label></th>
 						<td>
 							<select id="crumb_view" name="crumb_view">
@@ -379,4 +468,6 @@ class Crumb {
 	}
 }
 
+register_activation_hook( __FILE__, [ 'Crumb', 'activate' ] );
+register_deactivation_hook( __FILE__, [ 'Crumb', 'deactivate' ] );
 Crumb::get_instance();

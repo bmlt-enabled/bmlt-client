@@ -5,7 +5,7 @@ Tags: narcotics anonymous, na, meetings, bmlt, meeting finder
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 1.0.3
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -64,6 +64,10 @@ Yes. Enter the service body ID (or a comma-separated list of IDs) in the Service
 
 Yes. Choose **Map** from the Default View dropdown in **Settings → Crumb**, or use `view="map"` in the shortcode. Visitors can also switch views at runtime via the `?view=` query parameter.
 
+= Can I get clean URLs without the # in them? =
+
+Yes. Enter the page slug (e.g. `meetings`) in the **Base Path for Pretty URLs** setting under **Settings → Crumb**. After saving, go to **Settings → Permalinks** and click **Save Changes** to update rewrite rules. Meeting detail URLs will then look like `/meetings/monday-night-meeting-42` instead of `/#/monday-night-meeting-42`.
+
 = Does it work with page builders? =
 
 The shortcode works in any context that processes WordPress shortcodes. If your page builder does not render shortcodes automatically, use its dedicated shortcode block.
@@ -94,6 +98,9 @@ The widget fetches meeting data from a BMLT server whose URL you configure in Se
 - Privacy policy: Determined by the operator of your configured BMLT server. Learn more at https://bmlt.app.
 
 == Changelog ==
+
+= 1.1.0 =
+* Added **Base Path for Pretty URLs** setting — enables clean meeting detail URLs (e.g. `/meetings/monday-night-meeting-42`) using WordPress rewrite rules. Leave empty to keep default hash-based routing.
 
 = 1.0.3 =
 * Added Widget Configuration setting (JSON) for CrumbWidgetConfig options (language, geolocation, darkMode, columns, map tiles, etc.).

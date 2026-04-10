@@ -29,7 +29,12 @@ Configured under **Settings → Crumb**. All settings can be overridden per-shor
 |----------------------|---------------------|------------------------------------------|
 | Server URL           | `server`            | Required. Full URL to your BMLT Server   |
 | Service Body IDs     | `service_body`      | Optional. Single ID or comma-separated list |
+| Base Path            | —                   | Optional. Page slug for pretty URLs      |
 | —                    | `geolocation`       | Optional. `true` or `false` per page     |
 | Widget Configuration | —                   | Optional. JSON for CrumbWidgetConfig     |
+
+### Pretty URLs
+
+By default meeting detail URLs use hash-based routing (`#/monday-night-meeting-42`). To enable clean URLs like `/meetings/monday-night-meeting-42`, enter the page slug (e.g. `meetings`) in the **Base Path for Pretty URLs** setting. After saving, go to **Settings → Permalinks** and click **Save Changes** to update rewrite rules.
 
 Full documentation at **[crumb.bmlt.app](https://crumb.bmlt.app/)**.

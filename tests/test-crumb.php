@@ -105,6 +105,69 @@ class Test_Crumb extends WP_UnitTestCase {
 	}
 
 	// -------------------------------------------------------------------------
+	// Base path / pretty URLs
+	// -------------------------------------------------------------------------
+
+	public function test_shortcode_no_base_path_omits_data_path() {
+		delete_option( 'crumb_base_path' );
+		$html = do_shortcode( '[crumb]' );
+		$this->assertStringNotContainsString( 'data-path', $html );
+	}
+
+	public function test_shortcode_base_path_adds_data_path_attribute() {
+		update_option( 'crumb_base_path', 'meetings' );
+		$html = do_shortcode( '[crumb]' );
+		$this->assertStringContainsString( 'data-path="/meetings"', $html );
+		delete_option( 'crumb_base_path' );
+	}
+
+	public function test_shortcode_base_path_strips_slashes() {
+		update_option( 'crumb_base_path', '/meetings/' );
+		$html = do_shortcode( '[crumb]' );
+		$this->assertStringContainsString( 'data-path="/meetings"', $html );
+		delete_option( 'crumb_base_path' );
+	}
+
+	public function test_sanitize_base_path_trims_slashes() {
+		$result = Crumb::sanitize_base_path( '/meetings/' );
+		$this->assertSame( 'meetings', $result );
+	}
+
+	public function test_sanitize_base_path_empty_returns_empty() {
+		$this->assertSame( '', Crumb::sanitize_base_path( '' ) );
+	}
+
+	public function test_sanitize_base_path_change_triggers_rewrite_flush() {
+		update_option( 'crumb_base_path', 'old-path' );
+		update_option( 'crumb_rewrite_version', Crumb::REWRITE_VERSION );
+		Crumb::sanitize_base_path( 'new-path' );
+		$this->assertSame( '', get_option( 'crumb_rewrite_version' ) );
+		delete_option( 'crumb_base_path' );
+		delete_option( 'crumb_rewrite_version' );
+	}
+
+	public function test_sanitize_base_path_same_value_no_flush() {
+		update_option( 'crumb_base_path', 'meetings' );
+		update_option( 'crumb_rewrite_version', Crumb::REWRITE_VERSION );
+		Crumb::sanitize_base_path( 'meetings' );
+		$this->assertSame( Crumb::REWRITE_VERSION, get_option( 'crumb_rewrite_version' ) );
+		delete_option( 'crumb_base_path' );
+		delete_option( 'crumb_rewrite_version' );
+	}
+
+	public function test_activate_sets_rewrite_version() {
+		Crumb::activate();
+		$this->assertSame( Crumb::REWRITE_VERSION, get_option( 'crumb_rewrite_version' ) );
+		delete_option( 'crumb_rewrite_version' );
+	}
+
+	public function test_deactivate_removes_rewrite_version() {
+		update_option( 'crumb_rewrite_version', Crumb::REWRITE_VERSION );
+		Crumb::deactivate();
+		$this->assertFalse( get_option( 'crumb_rewrite_version' ) );
+	}
+
+	// -------------------------------------------------------------------------
 	// sanitize_config
 	// -------------------------------------------------------------------------
 
@@ -147,6 +210,7 @@ class Test_Crumb extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'crumb_service_body', $registered );
 		$this->assertArrayHasKey( 'crumb_css_template', $registered );
 		$this->assertArrayHasKey( 'crumb_view', $registered );
+		$this->assertArrayHasKey( 'crumb_base_path', $registered );
 		$this->assertArrayHasKey( 'crumb_widget_config', $registered );
 	}
 
