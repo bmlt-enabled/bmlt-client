@@ -15,4 +15,4 @@ phpunit.xml export-ignore
 CONTRIBUTING.md export-ignore
 README.md export-ignore
 /.github export-ignore
-assets/
+assets/ export-ignore
