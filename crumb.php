@@ -3,7 +3,7 @@
  * Plugin Name: Crumb
  * Plugin URI: https://wordpress.org/plugins/crumb/
  * Description: Embeds the Crumb meeting finder widget on any page or post using a shortcode.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: bmltenabled
  * Author URI: https://bmlt.app
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CRUMB_VERSION', '1.1.0' );
+define( 'CRUMB_VERSION', '1.1.1' );
 
 class Crumb {
 
@@ -124,7 +124,7 @@ class Crumb {
 
 		// Resolve view: shortcode attr → saved option → omit (widget uses its own default).
 		$view_raw     = $atts['view'] ?? get_option( 'crumb_view', '' );
-		$allowed_views = [ 'list', 'map' ];
+		$allowed_views = [ 'list', 'map', 'both' ];
 		$view          = in_array( $view_raw, $allowed_views, true ) ? $view_raw : '';
 
 		$div = '<div id="crumb-widget" data-server="' . $server . '"';
@@ -424,6 +424,7 @@ class Crumb {
 								<option value="" <?php selected( get_option( 'crumb_view', '' ), '' ); ?>><?php esc_html_e( '— Widget Default (list) —', 'crumb' ); ?></option>
 								<option value="list" <?php selected( get_option( 'crumb_view', '' ), 'list' ); ?>>List</option>
 								<option value="map" <?php selected( get_option( 'crumb_view', '' ), 'map' ); ?>>Map</option>
+								<option value="both" <?php selected( get_option( 'crumb_view', '' ), 'both' ); ?>>Both (map above list)</option>
 							</select>
 							<p class="description">Optional. Sets the default view when the widget loads. Can be overridden at runtime via the <code>?view=</code> query parameter, or per-page via the shortcode <code>view</code> attribute.</p>
 						</td>

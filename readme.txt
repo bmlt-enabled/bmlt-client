@@ -5,7 +5,7 @@ Tags: narcotics anonymous, na, meetings, bmlt, meeting finder
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,7 +36,7 @@ Shortcode attributes:
 
 * `server` — BMLT server URL (overrides the value set in Settings → Crumb)
 * `service_body` — Service body ID or comma-separated list; leave empty to show all meetings
-* `view` — Default view when the widget loads: `list` (default) or `map`; can also be overridden at runtime via the `?view=` query parameter
+* `view` — Default view when the widget loads: `list` (default), `map`, or `both` (map above list with no toggle); can also be overridden at runtime via the `?view=` query parameter
 * `geolocation` — Enable or disable geolocation for this page: `true` or `false`
 
 = Documentation =
@@ -62,7 +62,7 @@ Yes. Enter the service body ID (or a comma-separated list of IDs) in the Service
 
 = Can I set the widget to open in map view by default? =
 
-Yes. Choose **Map** from the Default View dropdown in **Settings → Crumb**, or use `view="map"` in the shortcode. Visitors can also switch views at runtime via the `?view=` query parameter.
+Yes. Choose **Map** from the Default View dropdown in **Settings → Crumb**, or use `view="map"` in the shortcode. You can also choose **Both** to display the map above the meeting list simultaneously with no list/map toggle. Visitors can also switch views at runtime via the `?view=` query parameter.
 
 = Can I get clean URLs without the # in them? =
 
@@ -98,6 +98,9 @@ The widget fetches meeting data from a BMLT server whose URL you configure in Se
 - Privacy policy: Determined by the operator of your configured BMLT server. Learn more at https://bmlt.app.
 
 == Changelog ==
+
+= 1.1.1 =
+* Added `both` as a valid `view` option — displays the map above the meeting list with no list/map toggle.
 
 = 1.1.0 =
 * Added **Base Path for Pretty URLs** setting — enables clean meeting detail URLs (e.g. `/meetings/monday-night-meeting-42`) using WordPress rewrite rules. Leave empty to keep default hash-based routing.

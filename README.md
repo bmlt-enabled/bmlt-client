@@ -38,6 +38,7 @@ Configured under **Settings → Crumb**. Settings can be overridden per-shortcod
 |----------------------|---------------------|------------------------------------------|
 | Server URL           | `server`            | Required. Full URL to your BMLT Server   |
 | Service Body IDs     | `service_body`      | Optional. Single ID or comma-separated list |
+| Default View         | `view`              | Optional. `list` (default), `map`, or `both` (map above list) |
 | Base Path            | —                   | Optional. Page slug for pretty URLs      |
 | —                    | `geolocation`       | Optional. `true` or `false` per page     |
 | Widget Configuration | —                   | Optional. JSON for CrumbWidgetConfig     |
