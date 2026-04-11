@@ -57,6 +57,11 @@ class Test_Crumb extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'data-view="map"', $html );
 	}
 
+	public function test_shortcode_view_both() {
+		$html = do_shortcode( '[crumb view="both"]' );
+		$this->assertStringContainsString( 'data-view="both"', $html );
+	}
+
 	public function test_shortcode_invalid_view_is_ignored() {
 		$html = do_shortcode( '[crumb view="calendar"]' );
 		$this->assertStringNotContainsString( 'data-view', $html );
@@ -101,6 +106,13 @@ class Test_Crumb extends WP_UnitTestCase {
 		update_option( 'crumb_view', 'map' );
 		$html = do_shortcode( '[crumb]' );
 		$this->assertStringContainsString( 'data-view="map"', $html );
+		delete_option( 'crumb_view' );
+	}
+
+	public function test_shortcode_uses_saved_both_view_option() {
+		update_option( 'crumb_view', 'both' );
+		$html = do_shortcode( '[crumb]' );
+		$this->assertStringContainsString( 'data-view="both"', $html );
 		delete_option( 'crumb_view' );
 	}
 
