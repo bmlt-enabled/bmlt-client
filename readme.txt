@@ -97,6 +97,11 @@ The widget fetches meeting data from a BMLT server whose URL you configure in Se
 - When: On each search or filter action within the widget
 - Privacy policy: Determined by the operator of your configured BMLT server. Learn more at https://bmlt.app.
 
+== Screenshots ==
+
+1. List view — meeting results with day, time, location, and address. Click any meeting name to see full details.
+2. Map view — meeting locations plotted on an interactive map with the same search and filter controls.
+
 == Changelog ==
 
 = 1.1.1 =
