@@ -760,6 +760,56 @@ class Test_Crumb extends WP_UnitTestCase {
 		delete_option( 'bmlt_tabs_options' );
 	}
 
+	// -------------------------------------------------------------------------
+	// Crouton compatibility — no-op helper shortcodes
+	// -------------------------------------------------------------------------
+
+	public function test_crouton_noop_shortcodes_are_registered() {
+		foreach ( Crumb::CROUTON_NOOP_TAGS as $tag ) {
+			$this->assertTrue( shortcode_exists( $tag ), "Expected {$tag} to be registered" );
+		}
+	}
+
+	public function test_crouton_noop_shortcodes_render_empty() {
+		foreach ( Crumb::CROUTON_NOOP_TAGS as $tag ) {
+			$this->assertSame( '', do_shortcode( "[{$tag}]" ), "Expected [{$tag}] to render empty" );
+		}
+	}
+
+	public function test_crouton_noop_shortcodes_render_empty_with_attributes() {
+		// Attributes should be ignored; output stays empty.
+		$this->assertSame( '', do_shortcode( '[bmlt_count live="1"]' ) );
+		$this->assertSame( '', do_shortcode( '[root_service_body field="name"]' ) );
+		$this->assertSame( '', do_shortcode( '[bmlt_handlebar template="foo"]' ) );
+	}
+
+	public function test_register_crouton_shortcodes_does_not_overwrite_noop_tag() {
+		global $shortcode_tags;
+		$saved    = $shortcode_tags['bmlt_count'] ?? null;
+		$sentinel = static function () {
+			return 'PRE-EXISTING';
+		};
+		remove_shortcode( 'bmlt_count' );
+		add_shortcode( 'bmlt_count', $sentinel );
+
+		Crumb::register_crouton_shortcodes();
+		$this->assertSame( 'PRE-EXISTING', do_shortcode( '[bmlt_count]' ) );
+
+		// Restore.
+		remove_shortcode( 'bmlt_count' );
+		if ( $saved ) {
+			$shortcode_tags['bmlt_count'] = $saved;
+		}
+	}
+
+	public function test_crouton_noop_tags_not_in_compat_tags() {
+		// No-op tags don't render a widget, so they shouldn't trigger script enqueue.
+		$compat = Crumb::compat_tags();
+		foreach ( Crumb::CROUTON_NOOP_TAGS as $tag ) {
+			$this->assertNotContains( $tag, $compat, "{$tag} should not be in compat_tags" );
+		}
+	}
+
 	public function test_crouton_shortcode_combines_attribute_and_fallback() {
 		// root_server from crouton fallback; service_body from shortcode att.
 		delete_option( 'crumb_server' );
