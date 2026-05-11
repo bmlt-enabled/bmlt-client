@@ -5,7 +5,7 @@ Tags: narcotics anonymous, na, meetings, bmlt, meeting finder
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 1.3.1
+Stable tag: 1.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -124,6 +124,9 @@ The widget fetches meeting data from a BMLT server whose URL you configure in Se
 
 == Changelog ==
 
+= 1.3.2 =
+* Extended the crouton compatibility layer to register empty-string stubs for crouton's helper shortcodes (`[bmlt_count]`, `[meeting_count]`, `[group_count]`, `[service_body_names]`, `[root_service_body]`, `[bmlt_handlebar]`, `[init_crouton]`) so pages don't render the literal shortcode text after crouton is deactivated. These have no Crumb equivalent and output nothing; the surrounding page content remains intact.
+
 = 1.3.1 =
 * Added compatibility layer for the [crouton](https://wordpress.org/plugins/crouton/) plugin. Crumb now registers `[bmlt_tabs]`, `[bmlt_map]`, `[crouton_tabs]`, and `[crouton_map]` shortcodes and renders them with the Crumb widget when crouton is not active. Shortcode attributes (`root_server`, `service_body`, `service_body_1`, `formats`, `report_update_url`) are translated automatically.
 * Crumb falls back to crouton's saved settings (server URL, service body, format IDs, update URL) when the corresponding Crumb option is empty — installing and activating is enough; no page or settings edits required.
@@ -163,6 +166,9 @@ The widget fetches meeting data from a BMLT server whose URL you configure in Se
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.3.2 =
+Suppresses literal `[bmlt_count]`, `[meeting_count]`, `[group_count]`, `[service_body_names]`, `[root_service_body]`, `[bmlt_handlebar]`, and `[init_crouton]` shortcode text on pages after crouton is deactivated. Safe to update.
 
 = 1.3.1 =
 Adds drop-in compatibility for the crouton plugin: crouton shortcodes (`[bmlt_tabs]`, `[bmlt_map]`, `[crouton_tabs]`, `[crouton_map]`) now render with the Crumb widget and crouton's saved settings are used as fallbacks. Safe to update.

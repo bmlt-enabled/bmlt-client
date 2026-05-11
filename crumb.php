@@ -3,7 +3,7 @@
  * Plugin Name: Crumb
  * Plugin URI: https://wordpress.org/plugins/crumb/
  * Description: Embeds the Crumb meeting finder widget on any page or post using a shortcode.
- * Version: 1.3.1
+ * Version: 1.3.2
  * Author: bmltenabled
  * Author URI: https://bmlt.app
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CRUMB_VERSION', '1.3.1' );
+define( 'CRUMB_VERSION', '1.3.2' );
 
 class Crumb {
 
@@ -38,6 +38,21 @@ class Crumb {
 		'crouton_tabs' => 'list',
 		'bmlt_map'     => 'both',
 		'bmlt_tabs'    => 'list',
+	];
+
+	/**
+	 * Crouton helper shortcodes with no crumb equivalent.
+	 * Registered as empty-string stubs so pages don't show the literal shortcode
+	 * text after crouton is deactivated.
+	 */
+	const CROUTON_NOOP_TAGS = [
+		'init_crouton',
+		'bmlt_count',
+		'meeting_count',
+		'group_count',
+		'service_body_names',
+		'root_service_body',
+		'bmlt_handlebar',
 	];
 
 	public static function get_instance(): self {
@@ -170,6 +185,14 @@ class Crumb {
 					return self::crouton_compat_shortcode( $atts, $view );
 				}
 			);
+		}
+		// Helper shortcodes with no crumb equivalent — register as empty-string stubs
+		// so pages don't render the literal "[bmlt_count]" text after crouton is removed.
+		// These do NOT trigger widget enqueue, so they're kept out of $compat_tags.
+		foreach ( self::CROUTON_NOOP_TAGS as $tag ) {
+			if ( ! shortcode_exists( $tag ) ) {
+				add_shortcode( $tag, '__return_empty_string' );
+			}
 		}
 	}
 
