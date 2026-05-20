@@ -972,6 +972,51 @@ class Test_Crumb extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'data-view="both"', $html );
 	}
 
+	public function test_saved_crumb_view_beats_bmlt_tabs_default() {
+		// Admin Default View = "Both" should win over the tag-implied "list".
+		// Regression: previously crouton_compat_shortcode always forced view to the
+		// tag default, overriding the admin's explicit choice.
+		update_option( 'crumb_view', 'both' );
+
+		$html = do_shortcode( '[bmlt_tabs]' );
+		$this->assertStringContainsString( 'data-view="both"', $html );
+
+		delete_option( 'crumb_view' );
+	}
+
+	public function test_saved_crumb_view_beats_bmlt_map_default() {
+		// Same precedence on map-named tags: admin "list" wins over tag default "both".
+		update_option( 'crumb_view', 'list' );
+
+		$html = do_shortcode( '[bmlt_map]' );
+		$this->assertStringContainsString( 'data-view="list"', $html );
+
+		delete_option( 'crumb_view' );
+	}
+
+	public function test_show_map_1_beats_saved_crumb_view() {
+		// Explicit show_map="1" on the shortcode is the user's per-instance override
+		// and still wins over a globally-saved Default View.
+		update_option( 'crumb_view', 'list' );
+
+		$html = do_shortcode( '[bmlt_tabs show_map="1"]' );
+		$this->assertStringContainsString( 'data-view="both"', $html );
+
+		delete_option( 'crumb_view' );
+	}
+
+	public function test_crouton_show_map_admin_fallback_beats_bmlt_tabs_default() {
+		// Even without a saved crumb_view, crouton's show_map='1' admin option
+		// (mapped to 'both' by crouton_fallback_value) should beat the bmlt_tabs default.
+		delete_option( 'crumb_view' );
+		update_option( 'bmlt_tabs_options', [ 'show_map' => '1' ] );
+
+		$html = do_shortcode( '[bmlt_tabs]' );
+		$this->assertStringContainsString( 'data-view="both"', $html );
+
+		delete_option( 'bmlt_tabs_options' );
+	}
+
 	public function test_crouton_report_update_url_attribute_maps_to_update_url() {
 		// Already-templated URL passes through unchanged (no double-decoration).
 		$html = do_shortcode( '[crouton_tabs report_update_url="https://example.org/form/?meeting_id={meeting_id}"]' );

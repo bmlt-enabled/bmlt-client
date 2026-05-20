@@ -5,7 +5,7 @@ Tags: narcotics anonymous, na, meetings, bmlt, meeting finder
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 1.8.3
+Stable tag: 1.8.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,9 @@ The widget fetches meeting data from a BMLT server whose URL you configure in Se
 
 == Changelog ==
 
+= 1.8.4 =
+* Fixed Default View admin setting being ignored by the crouton-compat shortcodes. `[bmlt_tabs]` / `[crouton_tabs]` / `[bmlt_map]` / `[crouton_map]` were unconditionally forcing the tag-implied view (`list` for `*_tabs`, `both` for `*_map`), which overrode whatever was saved in the admin's Default View dropdown. Resolution now follows: explicit `show_map="1"` on the shortcode → `both` (highest, user-written); else a saved Default View (including the crouton `show_map` admin-option fallback) wins; else the tag-implied default is used as a last-resort fallback for migrating users.
+
 = 1.8.3 =
 * Added **Header** admin setting — dedicated dropdown (Widget Default / Visible / Hidden) to show or hide the widget's header bar (title, meeting/group counts, search/filter controls). Stored as `crumb_hide_header`; overridden by a `hideHeader` key in Widget Configuration.
 * Fixed crouton `report_update_url` migration: crouton stores a bare URL (e.g. `/submitschedulechange`) and appends `?meeting_id={id}` at render time, but the Crumb widget requires a URL template containing `{meeting_id}` (or another `{token}`) or it drops the link entirely. Both migration paths — the admin-option fallback from `bmlt_tabs_options[report_update_url]` and the shortcode-level `report_update_url` attribute on `[bmlt_tabs]` / `[crouton_tabs]` / `[bmlt_map]` / `[crouton_map]` — now auto-append `?meeting_id={meeting_id}` (or `&meeting_id={meeting_id}` if a query string is already present). Values that already contain a `{token}` are passed through unchanged so deliberately-templated URLs aren't double-decorated.
@@ -200,6 +203,9 @@ The widget fetches meeting data from a BMLT server whose URL you configure in Se
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.8.4 =
+Fixes the Default View admin setting being overridden by `[bmlt_tabs]` / `[crouton_tabs]` / `[bmlt_map]` / `[crouton_map]`. Safe to update.
 
 = 1.8.3 =
 Adds Header admin setting (show/hide the widget header) and fixes crouton → Crumb migration of `report_update_url` so the Update Meeting link survives the move. Safe to update.

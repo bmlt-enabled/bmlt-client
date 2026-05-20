@@ -3,7 +3,7 @@
  * Plugin Name: Crumb
  * Plugin URI: https://wordpress.org/plugins/crumb/
  * Description: Embeds the Crumb meeting finder widget on any page or post using a shortcode.
- * Version: 1.8.3
+ * Version: 1.8.4
  * Author: bmltenabled
  * Author URI: https://bmlt.app
  * License: GPL v2 or later
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'CRUMB_VERSION', '1.8.3' );
+define( 'CRUMB_VERSION', '1.8.4' );
 
 class Crumb {
 
@@ -265,12 +265,18 @@ class Crumb {
 
 	public static function crouton_compat_shortcode( $atts, string $view ): string {
 		$atts       = is_array( $atts ) ? $atts : [];
-		$translated = [ 'view' => $view ];
+		$translated = [];
 
-		// Crouton's show_map="1" explicitly asks for a map alongside the listing;
-		// honor it by upgrading the tag's default view to "both".
+		// View resolution for crouton-compat shortcodes:
+		//   1. Explicit show_map="1" on the shortcode → view=both (user wrote it, highest).
+		//   2. Admin Default View (or its crouton show_map fallback) when one is saved →
+		//      let setup_shortcode resolve from the option by omitting `view` here.
+		//   3. Tag-implied default ('list' for *_tabs, 'both' for *_map) — last resort for
+		//      migrating users who haven't configured a Default View yet.
 		if ( isset( $atts['show_map'] ) && '1' === (string) $atts['show_map'] ) {
 			$translated['view'] = 'both';
+		} elseif ( '' === self::get_option_or_crouton( 'crumb_view', '' ) ) {
+			$translated['view'] = $view;
 		}
 
 		if ( isset( $atts['root_server'] ) ) {
